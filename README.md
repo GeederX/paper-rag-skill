@@ -1,0 +1,47 @@
+# paperrag skill
+
+A reusable `paperrag` skill template for agent environments, designed to build a local RAG knowledge base from academic PDF papers.
+
+## Repository Contents
+
+- `skills/paperrag/SKILL.md`: skill definition and usage instructions
+- `skills/paperrag/references/workflow.md`: detailed workflow and troubleshooting guide
+- `skills/paperrag/assets/PaperRAG/`: runnable template (scripts + config)
+
+## What It Does
+
+- `pdf_to_text_converter.py`: extracts text from PDFs in `papers/`
+- `build_rag_index.py`: chunks text and writes embeddings into ChromaDB
+- `query_rag.py`: exposes `query_for_agent()` for agent-side retrieval
+- Supports incremental updates: re-runs skip already processed content
+
+## Local Validation (Optional)
+
+```bash
+cd skills/paperrag/assets/PaperRAG
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Then set `api_key` in `config.json`, place PDFs in `papers/`, and run:
+
+```bash
+python pdf_to_text_converter.py
+python build_rag_index.py
+```
+
+## Install as a Skill
+
+Copy `skills/paperrag` into your skills directory (for example `~/.agents/skills/paperrag`).
+
+## GitHub Publishing Notes
+
+- Suggested repo name: `paperrag-skill`
+- Suggested first release tag: `v0.1.0`
+- Suggested topics: `skill`, `rag`, `papers`, `chromadb`
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE` for details.

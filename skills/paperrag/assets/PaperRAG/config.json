@@ -1,0 +1,12 @@
+{
+  "api_key": "your-api-key-here",
+  "base_url": "https://api.openai.com/v1",
+  "embedding_model": "text-embedding-3-large",
+  "collection_name": "my_papers",
+  "chunk_size": 1000,
+  "chunk_overlap": 100,
+  "max_workers": 20,
+  "batch_size": 50,
+  "top_k": 5,
+  "expand_neighbors": true
+}
