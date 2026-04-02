@@ -36,12 +36,6 @@ python build_rag_index.py
 
 Copy `skills/paperrag` into your skills directory (for example `~/.agents/skills/paperrag`).
 
-## GitHub Publishing Notes
-
-- Suggested repo name: `paperrag-skill`
-- Suggested first release tag: `v0.1.0`
-- Suggested topics: `skill`, `rag`, `papers`, `chromadb`
-
 ## License
 
 This project is licensed under the MIT License. See `LICENSE` for details.
