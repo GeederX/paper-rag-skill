@@ -108,7 +108,15 @@ def build_index():
         collection = chroma_client.get_collection(name=COLLECTION_NAME)
         print("[OK] Loaded existing ChromaDB collection", flush=True)
     except Exception:
-        collection = chroma_client.create_collection(name=COLLECTION_NAME)
+        collection = chroma_client.create_collection(
+            name=COLLECTION_NAME,
+            metadata={
+                "chunk_size": CHUNK_SIZE,
+                "chunk_overlap": CHUNK_OVERLAP,
+                "embedding_model": EMBEDDING_MODEL,
+                "description": "PaperRAG index",
+            },
+        )
         print("[OK] Created new ChromaDB collection", flush=True)
 
     # 2. Read text files
@@ -288,6 +296,20 @@ def build_index():
     print(f"  New chunks embedded: {len(all_chunks)}")
     print(f"  DB path : {CHROMA_DB_DIR}")
     print(f"  Collection: {COLLECTION_NAME}")
+
+    # Persist build parameters as collection metadata for future queries
+    try:
+        collection.modify(
+            metadata={
+                "chunk_size": CHUNK_SIZE,
+                "chunk_overlap": CHUNK_OVERLAP,
+                "embedding_model": EMBEDDING_MODEL,
+                "description": "PaperRAG index",
+            }
+        )
+        print(f"  Metadata : chunk_size={CHUNK_SIZE}, overlap={CHUNK_OVERLAP}")
+    except Exception as e:
+        print(f"  [WARNING] Could not update collection metadata: {e}")
 
 
 if __name__ == "__main__":

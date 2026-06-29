@@ -10,7 +10,7 @@ Usage:
     from query_rag import query_for_agent, RAGQueryEngine
 
     # Simple: get merged context string, then answer from it directly
-    context = query_for_agent("your query", top_k=5)
+    context = query_for_agent("your query", top_k=5, expand_neighbors=False)
 
     # Advanced: get per-document structured results
     engine = RAGQueryEngine()
@@ -61,6 +61,9 @@ class RAGQueryEngine:
 
         self.chroma_client = chromadb.PersistentClient(path=db_path)
         self.collection = self.chroma_client.get_collection(name=col_name)
+
+        # Read collection metadata (chunk_size, chunk_overlap, etc. from build time)
+        self.collection_metadata = self.collection.metadata or {}
 
         mapping_file = Path(db_path) / "chunk_mapping.json"
         with open(mapping_file, "r", encoding="utf-8") as f:
@@ -150,7 +153,11 @@ class RAGQueryEngine:
         return doc_chunks
 
 
-def query_for_agent(query: str, top_k: Optional[int] = None) -> str:
+def query_for_agent(
+    query: str,
+    top_k: Optional[int] = None,
+    expand_neighbors: Optional[bool] = None,
+) -> str:
     """
     Agent interface — retrieves relevant paper chunks and returns them as a plain string.
 
@@ -160,6 +167,8 @@ def query_for_agent(query: str, top_k: Optional[int] = None) -> str:
     Args:
         query: Natural language query
         top_k: Number of top chunks to retrieve (defaults to config value)
+        expand_neighbors: Whether to include adjacent chunks for richer context
+            (defaults to config value). Set to False for exact top_k results.
 
     Returns:
         Merged context string, e.g.:
@@ -172,7 +181,7 @@ def query_for_agent(query: str, top_k: Optional[int] = None) -> str:
         ... chunk text ...
     """
     engine = RAGQueryEngine()
-    doc_chunks = engine.retrieve(query, top_k=top_k)
+    doc_chunks = engine.retrieve(query, top_k=top_k, expand_neighbors=expand_neighbors)
 
     parts = []
     for doc_id, chunks in doc_chunks.items():

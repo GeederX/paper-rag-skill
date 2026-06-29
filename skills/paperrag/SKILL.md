@@ -108,6 +108,12 @@ Reads `papers/*.pdf`, writes `texts/*.txt`. Safe to re-run — skips already-con
 
 ### Stage 2 — Build Index
 
+**Before running this stage, ask the user about `chunk_size` and `chunk_overlap`:**
+
+> "Before building the index: chunk_size controls how many characters each text segment contains (default 1000), and chunk_overlap controls how much adjacent chunks overlap (default 100). Larger chunk_size gives more context per chunk but less precision; larger overlap helps preserve continuity across chunk boundaries. Would you like to adjust these, or use the defaults?"
+
+If the user is unsure, keep the defaults. Update `config.json` accordingly before running.
+
 ```bash
 python build_rag_index.py
 ```
@@ -129,7 +135,11 @@ sys.path.insert(0, "/path/to/PaperRAG")
 from query_rag import query_for_agent
 
 # Returns a merged context string — the agent reads this and answers directly
-context = query_for_agent("your question or keywords", top_k=5)
+context = query_for_agent("your question or keywords", top_k=5, expand_neighbors=False)
+
+# expand_neighbors (default: config value, True): when True, also includes the chunk
+# immediately before and after each top match for richer context. Set to False for
+# exact top_k results only.
 ```
 
 > **Note:** When importing `query_rag` from outside `PaperRAG/`, make sure the venv's
@@ -158,6 +168,17 @@ context = query_for_agent("the user's question")
 # The agent IS the LLM — read the context and answer directly.
 # No secondary LLM call needed.
 # e.g.: "Based on the retrieved literature: {context}\n\nAnswer: ..."
+```
+
+### Inspecting build-time metadata
+
+The `RAGQueryEngine` exposes `collection_metadata` with the parameters used when the
+index was built. This is useful for the agent to understand the chunking strategy:
+
+```python
+engine = RAGQueryEngine()
+print(engine.collection_metadata)
+# {'chunk_size': 1000, 'chunk_overlap': 100, 'embedding_model': 'text-embedding-3-large', ...}
 ```
 
 ## Workflow Details
